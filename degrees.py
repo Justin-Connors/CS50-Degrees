@@ -85,15 +85,50 @@ def main():
 
 
 def shortest_path(source, target):
-    """
-    Returns the shortest list of (movie_id, person_id) pairs
-    that connect the source to the target.
+    
 
-    If no possible path, returns None.
-    """
+    # frontier to keep track of the nodes to be explored
+    start = Node(state=source, parent=None, action=None)
+    frontier = QueueFrontier()
+    frontier.add(start)
 
-    # TODO
-    raise NotImplementedError
+    # empty set to store explored nodes
+    explored = set()
+
+    # keep looping until solution is found
+    while True:
+        # if nothing left in frontier, then no path
+        if frontier.empty():
+            raise Exception('No Solution')
+
+        # choose a node from the frontier
+        node = frontier.remove()
+        state = node.state
+
+        # if node is the goal, then we have a solution
+        if state == target:
+            actions = []
+            cells = []
+            while node.parent is not None:
+                actions.append(node.action)
+                cells.append(node.state)
+                node = node.parent
+            actions.reverse()
+            cells.reverse()
+            solution = []
+            for i in range(len(actions)):
+                solution.append((actions[i], cells[i]))
+            return solution
+
+        # mark node as explored
+        explored.add(state)
+
+        # add neighbors to frontier
+        for action, state in neighbors_for_person(state):
+            if not frontier.contains_state(state) and state not in explored:
+                child = Node(state=state, parent=node, action=action)
+                frontier.add(child)
+
 
 
 def person_id_for_name(name):
